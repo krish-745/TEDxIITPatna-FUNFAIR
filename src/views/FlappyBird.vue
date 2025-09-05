@@ -1,17 +1,25 @@
 <template>
-  <div class="game-wrapper">
-    <h1 class="title">🐦 Flappy Bird</h1>
+  <div class="game-wrapper" ref="gameWrapper">
+    <h1 class="title">Flappy Bird</h1>
     <div class="game-container">
       <canvas ref="canvas" width="400" height="450"></canvas>
       <div v-if="gameOver" class="overlay">
         <h2>Game Over!</h2>
         <p>Your Score: {{ score }}</p>
+
+        <input
+          v-model="roll"
+          placeholder="Enter Roll No"
+          class="roll-input"
+        />
+        <button @click="submitScore">Submit Score</button>
         <button @click="startGame">Restart</button>
       </div>
     </div>
+
     <div class="controls">
       <p>Score: <span class="score">{{ score }}</span></p>
-      <p class="instructions">Space/Click to Flap</p>
+      <p class="instructions">Space / Click / Tap to Flap</p>
     </div>
   </div>
 </template>
@@ -32,6 +40,9 @@ export default {
       score: 0,
       gameOver: false,
       gameLoop: null,
+      roll: "",  // Added roll number
+      snakeScore: 0,
+      stackScore: 0,
     };
   },
   mounted() {
@@ -61,7 +72,7 @@ export default {
     },
     handleKey(e) {
       if (e.code === "Space" || e.code === "ArrowUp") {
-        e.preventDefault(); // Prevent page scrolling
+        e.preventDefault();
         this.flap();
       }
     },
@@ -69,7 +80,6 @@ export default {
       const ctx = this.ctx;
       const canvas = this.$refs.canvas;
 
-      // Dark background
       ctx.fillStyle = "#0d0d0d";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -77,7 +87,7 @@ export default {
       this.bird.velocity += this.gravity;
       this.bird.y += this.bird.velocity;
 
-      // Draw bird with glow effect
+      // Draw bird
       ctx.shadowBlur = 15;
       ctx.shadowColor = "#ff0000";
       ctx.beginPath();
@@ -102,7 +112,6 @@ export default {
       this.pipes.forEach((pipe) => {
         pipe.x -= 2;
 
-        // Draw pipes with glow
         ctx.shadowBlur = 10;
         ctx.shadowColor = "#660000";
         ctx.fillStyle = "#cc0000";
@@ -115,7 +124,7 @@ export default {
         ctx.strokeRect(pipe.x, pipe.bottom, this.pipeWidth, canvas.height - pipe.bottom);
         ctx.shadowBlur = 0;
 
-        // Collision detection
+        // Collision
         if (
           this.bird.x + this.bird.radius > pipe.x &&
           this.bird.x - this.bird.radius < pipe.x + this.pipeWidth &&
@@ -132,7 +141,6 @@ export default {
 
       this.pipes = this.pipes.filter((pipe) => pipe.x + this.pipeWidth > 0);
 
-      // Ground and ceiling collision
       if (
         this.bird.y + this.bird.radius >= canvas.height ||
         this.bird.y - this.bird.radius <= 0
@@ -141,13 +149,34 @@ export default {
       }
 
       this.frame++;
-      if (!this.gameOver) {
-        this.gameLoop = requestAnimationFrame(this.update);
-      }
+      if (!this.gameOver) this.gameLoop = requestAnimationFrame(this.update);
     },
     endGame() {
       this.gameOver = true;
       cancelAnimationFrame(this.gameLoop);
+    },
+    async submitScore() {
+      if (!this.roll) {
+        alert("Please enter Roll No");
+        return;
+      }
+
+      try {
+        await fetch("https://script.google.com/macros/s/AKfycbyZERpdFBcjiPbUlzOfhMjuQUAFzxjDWWKaCD9jwbsKexbE8cBto2CSgPT3nrcvJy14ew/exec", {
+          method: "POST",
+          body: new URLSearchParams({
+            action: "upsert",
+            roll: this.roll,
+            snakeScore: this.snakeScore,
+            flappyScore: this.score,
+            stackScore: this.stackScore
+          }),
+        });
+        alert("Score submitted!");
+      } catch (err) {
+        console.error(err);
+        alert("Error submitting score");
+      }
     },
   },
   beforeUnmount() {
@@ -173,7 +202,7 @@ export default {
 
 .title {
   color: #ff1a1a;
-  text-shadow: 0 0 12px #ff0000, 0 0 24px #ff0000;
+  /* text-shadow: 0 0 12px #ff0000, 0 0 24px #ff0000; */
   margin-bottom: 20px;
   letter-spacing: 2px;
   text-align: center;
@@ -186,7 +215,7 @@ export default {
 
 canvas {
   border: 3px solid #660000;
-  box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
   border-radius: 8px;
   max-width: 100%;
   height: auto;
@@ -199,7 +228,7 @@ canvas {
 .score {
   color: #ff1a1a;
   font-weight: bold;
-  text-shadow: 0 0 8px #ff0000;
+  /* text-shadow: 0 0 8px #ff0000; */
 }
 
 .instructions {
@@ -244,14 +273,20 @@ button:hover {
 
 .overlay h2 {
   color: #ff3333;
-  text-shadow: 0 0 8px #ff0000;
+  /* text-shadow: 0 0 8px #ff0000; */
   margin-bottom: 10px;
-  font-size: 18px;
 }
 
-.overlay p {
-  color: #ffffff;
-  margin: 5px 0;
-  font-size: 14px;
+.roll-input {
+  margin: 8px 0;
+  padding: 6px;
+  border-radius: 4px;
+  border: none;
+  font-family: inherit;
+  text-align: center;
+  color: #fff;
+  background: #330000;
+  outline: none;
+  caret-color: #ff1a1a;
 }
 </style>

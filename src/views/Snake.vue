@@ -1,6 +1,6 @@
 <template>
   <div class="game-wrapper" ref="gameWrapper">
-    <h1 class="title">🐍 Snake Game</h1>
+    <h1 class="title">Snake Game</h1>
     <div class="game-layout">
       <div class="game-container">
         <canvas ref="gameCanvas" :width="boardWidth" :height="boardHeight"></canvas>
@@ -8,6 +8,13 @@
         <div v-if="gameOver" class="overlay">
           <h2>Game Over!</h2>
           <p>Your Score: {{ score }}</p>
+
+          <input
+            v-model="roll"
+            placeholder="Enter Roll No"
+            class="roll-input"
+          />
+          <button @click="submitScore">Submit Score</button>
           <button @click="startGame">Restart</button>
         </div>
       </div>
@@ -38,6 +45,7 @@ export default {
       gameStarted: false,
       touchStartX: 0,
       touchStartY: 0,
+      roll: "", // <-- Added roll no field
     };
   },
   methods: {
@@ -85,10 +93,9 @@ export default {
       }
     },
     draw() {
-      this.ctx.fillStyle = "#0d0d0d"; // dark blackish background
+      this.ctx.fillStyle = "#0d0d0d";
       this.ctx.fillRect(0, 0, this.boardWidth, this.boardHeight);
 
-      // grid lines
       this.ctx.strokeStyle = "#2a0a0a";
       for (let i = 0; i < this.boardWidth; i += this.tileSize) {
         this.ctx.beginPath();
@@ -103,7 +110,6 @@ export default {
         this.ctx.stroke();
       }
 
-      // snake
       this.snake.forEach((part, index) => {
         this.ctx.fillStyle = index === 0 ? "#ff1a1a" : "#ff4d4d";
         this.ctx.shadowBlur = 15;
@@ -111,7 +117,6 @@ export default {
         this.ctx.fillRect(part.x, part.y, this.tileSize, this.tileSize);
       });
 
-      // food
       this.ctx.fillStyle = "#999999";
       this.ctx.shadowBlur = 20;
       this.ctx.shadowColor = "#ff6600";
@@ -175,6 +180,28 @@ export default {
       this.gameOver = true;
       this.gameStarted = false;
     },
+    async submitScore() {
+      if (!this.roll) {
+        alert("Please enter Roll No");
+        return;
+      }
+      try {
+        await fetch("https://script.google.com/macros/s/AKfycbyZERpdFBcjiPbUlzOfhMjuQUAFzxjDWWKaCD9jwbsKexbE8cBto2CSgPT3nrcvJy14ew/exec", {
+          method: "POST",
+          body: new URLSearchParams({
+            action: "upsert",
+            roll: this.roll,
+            snakeScore: this.score,
+            flappyScore: this.flappyScore,
+            stackScore: this.stackScore
+          }),
+        });
+        alert("Score submitted!");
+      } catch (err) {
+        console.error(err);
+        alert("Error submitting score");
+      }
+    },
   },
   mounted() {
     const canvas = this.$refs.gameCanvas;
@@ -209,7 +236,7 @@ export default {
 
 .title {
   color: #ff1a1a;
-  text-shadow: 0 0 12px #ff0000, 0 0 24px #ff0000;
+  /* text-shadow: 0 0 12px #ff0000, 0 0 24px #ff0000; */
   margin-bottom: 20px;
   letter-spacing: 2px;
   text-align: center;
@@ -227,7 +254,7 @@ export default {
 
 canvas {
   border: 3px solid #660000;
-  box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
   border-radius: 8px;
   max-width: 100%;
   height: auto;
@@ -241,7 +268,6 @@ canvas {
 .score {
   color: #ff1a1a;
   font-weight: bold;
-  text-shadow: 0 0 8px #ff0000;
 }
 
 button {
@@ -277,7 +303,19 @@ button:hover {
 
 .overlay h2 {
   color: #ff3333;
-  text-shadow: 0 0 8px #ff0000;
   margin-bottom: 10px;
+}
+
+.roll-input {
+  margin: 8px 0;
+  padding: 6px;
+  border-radius: 4px;
+  border: none;
+  font-family: inherit;
+  text-align: center;
+  color: #fff;             /* White text */
+  background: #330000;     /* Dark reddish background */
+  outline: none;           /* Remove default outline */
+  caret-color: #ff1a1a;    /* Red cursor */
 }
 </style>

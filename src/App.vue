@@ -10,7 +10,7 @@ export default {
       setImmediate: true,
       handler(to, from) {
         // checks the title attribute of each route and updates the <title> of the page
-        document.title = `TEDxIITPatna | ${to.meta.title}`
+        document.title = `FUNFAIR | ${to.meta.title}`
       }
       // this can be extended to add custom meta tags on each page
       // these attributes are defined in /src/router/index.js

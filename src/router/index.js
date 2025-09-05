@@ -7,6 +7,17 @@ import { createRouter, createWebHistory } from "vue-router";
 // NOTE: when using lazy loading feature, be sure to add the webpackChunkName directives (yes, it's not random comments)
 const routes = [
   {
+    path: "/",
+    name: "home",
+    component: () =>
+      import(
+        /* webpackChunkName: "commingsoon" */ "../views/Home.vue"
+      ),
+    meta: {
+      title: "Home",
+    },
+  },
+  {
     path: "/snake",
     name: "snake",
     component: () =>

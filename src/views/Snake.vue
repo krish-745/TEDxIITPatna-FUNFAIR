@@ -11,7 +11,7 @@
 
           <input
             v-model="roll"
-            placeholder="Enter Roll No"
+            placeholder="Enter Roll Number"
             class="roll-input"
           />
           <button @click="submitScore">Submit Score</button>

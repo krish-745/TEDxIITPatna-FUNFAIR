@@ -175,7 +175,7 @@ export default {
     },
     async submitScore() {
       if (!this.roll) {
-        alert("Please enter Roll No");
+        alert("Please enter Roll Number");
         return;
       }
 

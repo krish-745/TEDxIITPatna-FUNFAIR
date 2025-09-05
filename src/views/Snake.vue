@@ -218,6 +218,13 @@ export default {
     // Only prevent default on game canvas
     canvas.addEventListener("touchstart", this.handleTouchStart, { passive: false });
     canvas.addEventListener("touchend", this.handleTouchEnd, { passive: false });
+    // Scroll lock: prevent scrolling on touch devices when interacting with the game
+    const wrapper = this.$refs.gameWrapper;
+    if (wrapper) {
+      wrapper.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+      }, { passive: false });
+    }
   },
   beforeUnmount() {
     const canvas = this.$refs.gameCanvas;

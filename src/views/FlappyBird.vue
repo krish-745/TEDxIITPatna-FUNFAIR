@@ -65,6 +65,16 @@ export default {
       this.lastTime = null;
       this.pipeTimer = 0;
 
+      // 🟢 Spawn first pipe immediately
+      const canvas = this.$refs.canvas;
+      let topHeight = Math.random() * (canvas.height - this.pipeGap - 100) + 50;
+      this.pipes.push({
+        x: canvas.width,
+        top: topHeight,
+        bottom: topHeight + this.pipeGap,
+        passed: false,
+      });
+
       if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
       this.gameLoop = requestAnimationFrame(this.update.bind(this));
     },

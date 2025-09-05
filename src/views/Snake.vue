@@ -146,12 +146,12 @@ export default {
         this.direction = { x: 20, y: 0 };
     },
     handleTouchStart(e) {
-      e.preventDefault(); // 🚀 Prevent scrolling
+      e.preventDefault(); // 🚀 block scrolling only when touching canvas
       this.touchStartX = e.changedTouches[0].screenX;
       this.touchStartY = e.changedTouches[0].screenY;
     },
     handleTouchEnd(e) {
-      e.preventDefault(); // 🚀 Prevent scrolling
+      e.preventDefault(); // 🚀 block scrolling only when touching canvas
       const dx = e.changedTouches[0].screenX - this.touchStartX;
       const dy = e.changedTouches[0].screenY - this.touchStartY;
 
@@ -210,14 +210,14 @@ export default {
     this.ctx = canvas.getContext("2d");
     this.draw();
 
-    const wrapper = this.$refs.gameWrapper;
-    wrapper.addEventListener("touchstart", this.handleTouchStart, { passive: false });
-    wrapper.addEventListener("touchend", this.handleTouchEnd, { passive: false });
+    // Only prevent default on game canvas
+    canvas.addEventListener("touchstart", this.handleTouchStart, { passive: false });
+    canvas.addEventListener("touchend", this.handleTouchEnd, { passive: false });
   },
   beforeUnmount() {
-    const wrapper = this.$refs.gameWrapper;
-    wrapper.removeEventListener("touchstart", this.handleTouchStart);
-    wrapper.removeEventListener("touchend", this.handleTouchEnd);
+    const canvas = this.$refs.gameCanvas;
+    canvas.removeEventListener("touchstart", this.handleTouchStart);
+    canvas.removeEventListener("touchend", this.handleTouchEnd);
   },
 };
 </script>
@@ -321,7 +321,8 @@ button:hover {
   caret-color: #ff1a1a;    /* Red cursor */
 }
 
-.game-wrapper {
-  touch-action: none; /* 🚀 disables default scroll/zoom/pan on touch */
+canvas {
+  touch-action: none; /* 🚀 disables default pan/zoom only inside canvas */
 }
+
 </style>

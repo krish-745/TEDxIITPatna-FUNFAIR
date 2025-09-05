@@ -31,7 +31,7 @@ export default {
       ctx: null,
       blocks: [],
       blockHeight: 30,
-      speed: 3,
+      speed: 150, // pixels per second (time-based now!)
       direction: 1,
       currentX: 0,
       currentWidth: 0,
@@ -40,9 +40,10 @@ export default {
       gameOver: false,
       gameLoop: null,
       cameraOffset: 0,
-      roll: "",          // <-- Added roll number
+      roll: "",
       snakeScore: 0,
       flappyScore: 0,
+      lastTime: null, // for deltaTime
     };
   },
   mounted() {
@@ -51,22 +52,28 @@ export default {
     this.startGame();
 
     window.addEventListener("keydown", this.handleKey);
-    canvas.addEventListener("click", this.placeBlock);
-    canvas.addEventListener("touchstart", this.placeBlock);
+
+    // Fix: only bind one event per device
+    if ("ontouchstart" in window) {
+      canvas.addEventListener("touchstart", this.placeBlock);
+    } else {
+      canvas.addEventListener("click", this.placeBlock);
+    }
   },
   methods: {
     startGame() {
       this.blocks = [{ x: 100, y: 420, width: 200 }];
       this.score = 0;
-      this.speed = 3;
       this.currentWidth = 200;
       this.currentX = 0;
       this.currentY = 420 - this.blockHeight;
       this.direction = 1;
       this.gameOver = false;
       this.cameraOffset = 0;
+      this.lastTime = performance.now();
+
       if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
-      this.update();
+      this.gameLoop = requestAnimationFrame(this.update);
     },
     handleKey(e) {
       if (e.code === "Space" || e.code === "ArrowUp") {
@@ -95,15 +102,20 @@ export default {
       this.currentWidth = newWidth;
       this.currentY -= this.blockHeight;
 
-      this.speed = 3 + Math.floor(this.score / 5);
+      // speed increases slightly with score (time-based, so keep px/sec)
+      this.speed = 150 + Math.floor(this.score / 5) * 20;
 
       if (this.currentY - this.cameraOffset < 100) {
         this.cameraOffset += this.blockHeight;
       }
     },
-    update() {
+    update: function (time) {
       const ctx = this.ctx;
       const canvas = this.$refs.canvas;
+
+      // Delta time calculation (seconds)
+      const deltaTime = (time - this.lastTime) / 1000;
+      this.lastTime = time;
 
       ctx.fillStyle = "#0d0d0d";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -114,7 +126,7 @@ export default {
       ctx.shadowBlur = 12;
       ctx.shadowColor = "#ff0000";
       this.blocks.forEach((block) => {
-        ctx.fillStyle = 'red';
+        ctx.fillStyle = "red";
         ctx.fillRect(block.x, block.y, block.width, this.blockHeight);
 
         ctx.strokeStyle = "#ffffff";
@@ -122,7 +134,8 @@ export default {
         ctx.strokeRect(block.x, block.y, block.width, this.blockHeight);
       });
 
-      this.currentX += this.speed * this.direction;
+      // Time-based movement
+      this.currentX += this.speed * this.direction * deltaTime;
       if (this.currentX + this.currentWidth > canvas.width || this.currentX < 0) {
         this.direction *= -1;
       }
@@ -161,7 +174,7 @@ export default {
             roll: this.roll,
             snakeScore: this.snakeScore,
             flappyScore: this.flappyScore,
-            stackScore: this.score
+            stackScore: this.score,
           }),
         });
         alert("Score submitted!");

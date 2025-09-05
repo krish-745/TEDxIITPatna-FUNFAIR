@@ -40,9 +40,10 @@ export default {
       score: 0,
       gameOver: false,
       gameLoop: null,
-      roll: "",  // Added roll number
+      roll: "",
       snakeScore: 0,
       stackScore: 0,
+      lastTime: null, // for delta time
     };
   },
   mounted() {
@@ -61,9 +62,10 @@ export default {
       this.frame = 0;
       this.score = 0;
       this.gameOver = false;
+      this.lastTime = null;
 
       if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
-      this.update();
+      this.gameLoop = requestAnimationFrame(this.update.bind(this));
     },
     flap() {
       if (!this.gameOver) {
@@ -76,7 +78,11 @@ export default {
         this.flap();
       }
     },
-    update() {
+    update(timestamp) {
+      if (!this.lastTime) this.lastTime = timestamp;
+      const delta = (timestamp - this.lastTime) / 16.67; // scale to 60fps
+      this.lastTime = timestamp;
+
       const ctx = this.ctx;
       const canvas = this.$refs.canvas;
 
@@ -84,12 +90,10 @@ export default {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Bird physics
-      this.bird.velocity += this.gravity;
-      this.bird.y += this.bird.velocity;
+      this.bird.velocity += this.gravity * delta;
+      this.bird.y += this.bird.velocity * delta;
 
       // Draw bird
-      ctx.shadowBlur = 15;
-      ctx.shadowColor = "#ff0000";
       ctx.beginPath();
       ctx.arc(this.bird.x, this.bird.y, this.bird.radius, 0, Math.PI * 2);
       ctx.fillStyle = "#ff1a1a";
@@ -97,7 +101,6 @@ export default {
       ctx.strokeStyle = "#ffffff";
       ctx.lineWidth = 2;
       ctx.stroke();
-      ctx.shadowBlur = 0;
 
       // Pipes
       if (this.frame % 90 === 0) {
@@ -110,10 +113,8 @@ export default {
       }
 
       this.pipes.forEach((pipe) => {
-        pipe.x -= 2;
+        pipe.x -= 2 * delta;
 
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = "#660000";
         ctx.fillStyle = "#cc0000";
         ctx.fillRect(pipe.x, 0, this.pipeWidth, pipe.top);
         ctx.fillRect(pipe.x, pipe.bottom, this.pipeWidth, canvas.height - pipe.bottom);
@@ -122,7 +123,6 @@ export default {
         ctx.lineWidth = 2;
         ctx.strokeRect(pipe.x, 0, this.pipeWidth, pipe.top);
         ctx.strokeRect(pipe.x, pipe.bottom, this.pipeWidth, canvas.height - pipe.bottom);
-        ctx.shadowBlur = 0;
 
         // Collision
         if (
@@ -134,8 +134,10 @@ export default {
           this.endGame();
         }
 
-        if (pipe.x + this.pipeWidth === this.bird.x) {
+        // Score
+        if (pipe.x + this.pipeWidth < this.bird.x && !pipe.passed) {
           this.score++;
+          pipe.passed = true;
         }
       });
 
@@ -149,7 +151,7 @@ export default {
       }
 
       this.frame++;
-      if (!this.gameOver) this.gameLoop = requestAnimationFrame(this.update);
+      if (!this.gameOver) this.gameLoop = requestAnimationFrame(this.update.bind(this));
     },
     endGame() {
       this.gameOver = true;
@@ -202,7 +204,6 @@ export default {
 
 .title {
   color: #ff1a1a;
-  /* text-shadow: 0 0 12px #ff0000, 0 0 24px #ff0000; */
   margin-bottom: 20px;
   letter-spacing: 2px;
   text-align: center;
@@ -228,7 +229,6 @@ canvas {
 .score {
   color: #ff1a1a;
   font-weight: bold;
-  /* text-shadow: 0 0 8px #ff0000; */
 }
 
 .instructions {
@@ -273,7 +273,6 @@ button:hover {
 
 .overlay h2 {
   color: #ff3333;
-  /* text-shadow: 0 0 8px #ff0000; */
   margin-bottom: 10px;
 }
 

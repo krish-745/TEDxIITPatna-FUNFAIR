@@ -8,7 +8,7 @@
 
     <!-- Leaderboard -->
     <section class="leaderboard">
-      <h2>🏆 Leaderboard</h2>
+      <h2>Leaderboard</h2>
 
       <div v-if="loading">
         <p>Loading leaderboard...</p>

@@ -50,6 +50,13 @@ export default {
     const canvas = this.$refs.canvas;
     this.ctx = canvas.getContext("2d");
     this.startGame();
+    // Scroll lock: prevent scrolling on touch devices when interacting with the game
+    const wrapper = this.$refs.gameWrapper;
+    if (wrapper) {
+      wrapper.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+      }, { passive: false });
+    }
 
     window.addEventListener("keydown", this.handleKey);
 

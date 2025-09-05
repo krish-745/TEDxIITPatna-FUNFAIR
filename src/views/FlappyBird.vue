@@ -65,6 +65,13 @@ export default {
       this.lastTime = null;
       this.pipeTimer = 0;
 
+          // Scroll lock: prevent scrolling on touch devices when interacting with the game
+          const wrapper = this.$refs.gameWrapper;
+          if (wrapper) {
+            wrapper.addEventListener('touchmove', function(e) {
+              e.preventDefault();
+            }, { passive: false });
+          }
       // 🟢 Spawn first pipe immediately
       const canvas = this.$refs.canvas;
       let topHeight = Math.random() * (canvas.height - this.pipeGap - 100) + 50;

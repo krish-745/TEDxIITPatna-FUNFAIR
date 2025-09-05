@@ -146,10 +146,12 @@ export default {
         this.direction = { x: 20, y: 0 };
     },
     handleTouchStart(e) {
+      e.preventDefault(); // 🚀 Prevent scrolling
       this.touchStartX = e.changedTouches[0].screenX;
       this.touchStartY = e.changedTouches[0].screenY;
     },
     handleTouchEnd(e) {
+      e.preventDefault(); // 🚀 Prevent scrolling
       const dx = e.changedTouches[0].screenX - this.touchStartX;
       const dy = e.changedTouches[0].screenY - this.touchStartY;
 
@@ -209,8 +211,8 @@ export default {
     this.draw();
 
     const wrapper = this.$refs.gameWrapper;
-    wrapper.addEventListener("touchstart", this.handleTouchStart);
-    wrapper.addEventListener("touchend", this.handleTouchEnd);
+    wrapper.addEventListener("touchstart", this.handleTouchStart, { passive: false });
+    wrapper.addEventListener("touchend", this.handleTouchEnd, { passive: false });
   },
   beforeUnmount() {
     const wrapper = this.$refs.gameWrapper;
@@ -317,5 +319,9 @@ button:hover {
   background: #330000;     /* Dark reddish background */
   outline: none;           /* Remove default outline */
   caret-color: #ff1a1a;    /* Red cursor */
+}
+
+.game-wrapper {
+  touch-action: none; /* 🚀 disables default scroll/zoom/pan on touch */
 }
 </style>

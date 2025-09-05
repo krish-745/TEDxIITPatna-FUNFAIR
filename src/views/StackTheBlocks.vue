@@ -173,6 +173,11 @@ export default {
         alert("Please enter Roll No");
         return;
       }
+      const rollRegex = /^2[0-9]{3}[a-zA-Z]{2}[0-9]{2}$/;
+      if (!rollRegex.test(this.roll)) {
+        alert("Invalid Roll Number format. Example: 2101CS01");
+        return;
+      }
 
       try {
         await fetch("https://script.google.com/macros/s/AKfycbyZERpdFBcjiPbUlzOfhMjuQUAFzxjDWWKaCD9jwbsKexbE8cBto2CSgPT3nrcvJy14ew/exec", {

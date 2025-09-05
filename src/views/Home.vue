@@ -68,7 +68,14 @@ export default {
       try {
         const res = await fetch(`${this.API_URL}?action=list`);
         const data = await res.json();
-        this.leaderboard = data;
+
+        const rollPattern = /^[0-9]{4}[A-Z]{2}[0-9]{2}$/;
+
+        // ✅ Only keep players with valid roll numbers (ignoring spaces before/after)
+        this.leaderboard = data.filter(player => {
+          const roll = player.roll.trim();
+          return rollPattern.test(roll);
+        });
       } catch (err) {
         console.error("Error fetching leaderboard:", err);
       } finally {

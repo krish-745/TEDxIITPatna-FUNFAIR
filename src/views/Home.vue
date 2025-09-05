@@ -15,7 +15,7 @@
       </div>
       <ul v-else-if="leaderboard.length > 0">
         <li
-          v-for="(player, index) in leaderboard"
+          v-for="(player, index) in leaderboard.slice(0, 3)"
           :key="index"
           :class="{
             gold: index === 0,
@@ -68,14 +68,7 @@ export default {
       try {
         const res = await fetch(`${this.API_URL}?action=list`);
         const data = await res.json();
-
-        const rollPattern = /^[0-9]{4}[A-Z]{2}[0-9]{2}$/;
-
-        // ✅ Only keep players with valid roll numbers (ignoring spaces before/after)
-        this.leaderboard = data.filter(player => {
-          const roll = player.roll.trim();
-          return rollPattern.test(roll);
-        });
+        this.leaderboard = data;
       } catch (err) {
         console.error("Error fetching leaderboard:", err);
       } finally {

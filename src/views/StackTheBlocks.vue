@@ -31,7 +31,7 @@ export default {
       ctx: null,
       blocks: [],
       blockHeight: 30,
-      speed: 150, // pixels per second (time-based now!)
+      speed: 150,
       direction: 1,
       currentX: 0,
       currentWidth: 0,
@@ -43,7 +43,7 @@ export default {
       roll: "",
       snakeScore: 0,
       flappyScore: 0,
-      lastTime: null, // for deltaTime
+      lastTime: null,
     };
   },
   mounted() {
@@ -53,7 +53,6 @@ export default {
 
     window.addEventListener("keydown", this.handleKey);
 
-    // Fix: only bind one event per device
     if ("ontouchstart" in window) {
       canvas.addEventListener("touchstart", this.placeBlock);
     } else {
@@ -62,10 +61,14 @@ export default {
   },
   methods: {
     startGame() {
+      const canvas = this.$refs.canvas;
+
       this.blocks = [{ x: 100, y: 420, width: 200 }];
       this.score = 0;
       this.currentWidth = 200;
-      this.currentX = 0;
+
+      // FIX 1: Start at canvas center instead of left edge
+      this.currentX = canvas.width / 2 - this.currentWidth / 2;
       this.currentY = 420 - this.blockHeight;
       this.direction = 1;
       this.gameOver = false;
@@ -73,7 +76,7 @@ export default {
       this.lastTime = performance.now();
 
       if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
-      this.gameLoop = requestAnimationFrame(this.update);
+      this.gameLoop = requestAnimationFrame((time) => this.update(time));
     },
     handleKey(e) {
       if (e.code === "Space" || e.code === "ArrowUp") {
@@ -102,20 +105,21 @@ export default {
       this.currentWidth = newWidth;
       this.currentY -= this.blockHeight;
 
-      // speed increases slightly with score (time-based, so keep px/sec)
       this.speed = 150 + Math.floor(this.score / 5) * 20;
 
       if (this.currentY - this.cameraOffset < 100) {
         this.cameraOffset += this.blockHeight;
       }
     },
-    update: function (time) {
+    update(time) {
       const ctx = this.ctx;
       const canvas = this.$refs.canvas;
 
-      // Delta time calculation (seconds)
-      const deltaTime = (time - this.lastTime) / 1000;
+      let deltaTime = (time - this.lastTime) / 1000;
       this.lastTime = time;
+
+      // FIX 2: Clamp abnormal delta times
+      if (deltaTime > 0.05) deltaTime = 0.016;
 
       ctx.fillStyle = "#0d0d0d";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -134,10 +138,14 @@ export default {
         ctx.strokeRect(block.x, block.y, block.width, this.blockHeight);
       });
 
-      // Time-based movement
       this.currentX += this.speed * this.direction * deltaTime;
       if (this.currentX + this.currentWidth > canvas.width || this.currentX < 0) {
         this.direction *= -1;
+        // Prevent it from "sticking" outside
+        this.currentX = Math.max(
+          0,
+          Math.min(this.currentX, canvas.width - this.currentWidth)
+        );
       }
 
       ctx.shadowColor = "#ff6600";
@@ -153,7 +161,7 @@ export default {
       ctx.restore();
 
       if (!this.gameOver) {
-        this.gameLoop = requestAnimationFrame(this.update);
+        this.gameLoop = requestAnimationFrame((time) => this.update(time));
       }
     },
     endGame() {
@@ -193,7 +201,6 @@ export default {
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
 
-/* Keep same styles as before for consistency */
 .game-wrapper { display:flex; flex-direction:column; align-items:center; font-family:"Press Start 2P", monospace; color:#fff; background:linear-gradient(160deg, #000, #1a0000); min-height:100vh; padding:20px; overflow:hidden; }
 .title { color:#ff1a1a; margin-bottom:20px; letter-spacing:2px; text-align:center; }
 .game-container { position:relative; margin-bottom:15px; }

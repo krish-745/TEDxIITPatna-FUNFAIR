@@ -36,14 +36,15 @@ export default {
       pipes: [],
       pipeGap: 120,
       pipeWidth: 60,
-      frame: 0,
       score: 0,
       gameOver: false,
       gameLoop: null,
       roll: "",
       snakeScore: 0,
       stackScore: 0,
-      lastTime: null, // for delta time
+      lastTime: null,   // for delta time
+      pipeTimer: 0,     // ms since last pipe
+      pipeInterval: 1500, // ms between pipes
     };
   },
   mounted() {
@@ -59,10 +60,10 @@ export default {
     startGame() {
       this.bird = { x: 80, y: 250, radius: 15, velocity: 0 };
       this.pipes = [];
-      this.frame = 0;
       this.score = 0;
       this.gameOver = false;
       this.lastTime = null;
+      this.pipeTimer = 0;
 
       if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
       this.gameLoop = requestAnimationFrame(this.update.bind(this));
@@ -80,7 +81,8 @@ export default {
     },
     update(timestamp) {
       if (!this.lastTime) this.lastTime = timestamp;
-      const delta = (timestamp - this.lastTime) / 16.67; // scale to 60fps
+      const deltaMs = timestamp - this.lastTime;
+      const delta = deltaMs / 16.67; // relative to 60fps
       this.lastTime = timestamp;
 
       const ctx = this.ctx;
@@ -102,16 +104,20 @@ export default {
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Pipes
-      if (this.frame % 90 === 0) {
+      // Pipe spawning (time-based)
+      this.pipeTimer += deltaMs;
+      if (this.pipeTimer > this.pipeInterval) {
         let topHeight = Math.random() * (canvas.height - this.pipeGap - 100) + 50;
         this.pipes.push({
           x: canvas.width,
           top: topHeight,
           bottom: topHeight + this.pipeGap,
+          passed: false,
         });
+        this.pipeTimer = 0;
       }
 
+      // Update and draw pipes
       this.pipes.forEach((pipe) => {
         pipe.x -= 2 * delta;
 
@@ -143,6 +149,7 @@ export default {
 
       this.pipes = this.pipes.filter((pipe) => pipe.x + this.pipeWidth > 0);
 
+      // Ground / ceiling collision
       if (
         this.bird.y + this.bird.radius >= canvas.height ||
         this.bird.y - this.bird.radius <= 0
@@ -150,7 +157,6 @@ export default {
         this.endGame();
       }
 
-      this.frame++;
       if (!this.gameOver) this.gameLoop = requestAnimationFrame(this.update.bind(this));
     },
     endGame() {

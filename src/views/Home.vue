@@ -8,18 +8,18 @@
 
     <!-- Leaderboard -->
     <section class="leaderboard">
-        <h2>🏆 Leaderboard</h2>
+      <h2>🏆 Leaderboard</h2>
 
-        <div v-if="loading">
-            <p>Loading leaderboard...</p>
-        </div>
-        <ul v-else-if="leaderboard.length > 0">
-            <li v-for="(player, index) in leaderboard" :key="index">
-                <span>{{ player.roll }}</span>
-                <span class="score">{{ player.totalScore }}</span>
-            </li>
-        </ul>
-        <p v-else>No scores yet. Be the first to play!</p>
+      <div v-if="loading">
+        <p>Loading leaderboard...</p>
+      </div>
+      <ul v-else-if="leaderboard.length > 0">
+        <li v-for="(player, index) in leaderboard" :key="index">
+          <span>{{ player.roll }}</span>
+          <span class="score">{{ player.totalScore }}</span>
+        </li>
+      </ul>
+      <p v-else>No scores yet. Be the first to play!</p>
     </section>
 
     <!-- Games -->
@@ -28,11 +28,11 @@
         v-for="(game, i) in games"
         :key="i"
         class="game-card"
-        @click="launchGame(game.name)"
+        @click="launchGame(game.route)"
       >
         <h3>{{ game.name }}</h3>
         <p>{{ game.description }}</p>
-        <button>Play</button>
+        <button @click.stop="launchGame(game.route)">Play</button>
       </div>
     </section>
   </div>
@@ -45,12 +45,13 @@ export default {
     return {
       leaderboard: [],
       games: [
-        { name: "Snake", description: "Classic snake game." },
-        { name: "Flappy Bird", description: "Tap to fly through obstacles." },
-        { name: "Stack The Blocks", description: "Test your timing and precision." },
+        { name: "Snake", description: "Classic snake game.", route: "/snake" },
+        { name: "Flappy Bird", description: "Tap to fly through obstacles.", route: "/flappybird" },
+        { name: "Stack The Blocks", description: "Test your timing and precision.", route: "/stacktheblocks" },
       ],
       loading: true,
-      API_URL: "https://script.google.com/macros/s/AKfycbyZERpdFBcjiPbUlzOfhMjuQUAFzxjDWWKaCD9jwbsKexbE8cBto2CSgPT3nrcvJy14ew/exec", // <-- Insert your Apps Script Web App URL
+      API_URL:
+        "https://script.google.com/macros/s/AKfycbyZERpdFBcjiPbUlzOfhMjuQUAFzxjDWWKaCD9jwbsKexbE8cBto2CSgPT3nrcvJy14ew/exec",
     };
   },
   methods: {
@@ -66,9 +67,8 @@ export default {
         this.loading = false;
       }
     },
-    launchGame(name) {
-      alert(`Launching ${name} 🎮`);
-      // Later you can replace this with <router-link> or mount the game component
+    launchGame(route) {
+      this.$router.push(route);
     },
   },
   mounted() {
@@ -99,7 +99,6 @@ export default {
 .title {
   font-size: 26px;
   color: #ff1a1a;
-  /* text-shadow: 0 0 12px #ff0000, 0 0 24px #ff0000; */
 }
 
 .subtitle {

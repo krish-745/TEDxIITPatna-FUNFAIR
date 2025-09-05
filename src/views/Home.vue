@@ -14,7 +14,15 @@
         <p>Loading leaderboard...</p>
       </div>
       <ul v-else-if="leaderboard.length > 0">
-        <li v-for="(player, index) in leaderboard" :key="index">
+        <li
+          v-for="(player, index) in leaderboard"
+          :key="index"
+          :class="{
+            gold: index === 0,
+            silver: index === 1,
+            bronze: index === 2
+          }"
+        >
           <span>{{ player.roll }}</span>
           <span class="score">{{ player.totalScore }}</span>
         </li>
@@ -193,4 +201,23 @@ button:hover {
   background: #cc0000;
   transform: scale(1.1);
 }
+
+.gold {
+  color: gold;
+  font-weight: bold;
+  /* text-shadow: 0 0 8px gold; */
+}
+
+.silver {
+  color: silver;
+  font-weight: bold;
+  /* text-shadow: 0 0 8px silver; */
+}
+
+.bronze {
+  color: #cd7f32; /* bronze */
+  font-weight: bold;
+  /* text-shadow: 0 0 8px #cd7f32; */
+}
+
 </style>

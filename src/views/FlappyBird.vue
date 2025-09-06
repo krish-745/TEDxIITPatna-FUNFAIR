@@ -52,18 +52,15 @@ export default {
     };
   },
   mounted() {
-    const canvas = this.$refs.canvas;
-    this.ctx = canvas.getContext("2d");
-
-    // keyboard
-    window.addEventListener("keydown", this.handleKey);
-
-    // click/touch to flap
-    canvas.addEventListener("click", this.flap);
-    canvas.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      this.flap();
-    }, { passive: false });
+    const wrapper = this.$refs.gameWrapper;
+    if (wrapper) {
+      wrapper.addEventListener("touchstart", (e) => {
+        if (!this.gameStarted || this.gameOver) return; // don’t flap when game isn’t running
+        if (e.target.tagName === "BUTTON" || e.target.tagName === "INPUT") return; // ignore taps on UI
+        e.preventDefault();
+        this.flap();
+      }, { passive: false });
+    }
   },
   beforeUnmount() {
     window.removeEventListener("keydown", this.handleKey);

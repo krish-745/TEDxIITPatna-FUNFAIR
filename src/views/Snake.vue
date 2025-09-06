@@ -361,7 +361,7 @@ button:hover {
 
 @media(max-width: 767px) {
   .game-wrapper {
-    padding-top: 60px;
+    padding-top: 80px;
   }
 }
 </style>

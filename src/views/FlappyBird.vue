@@ -83,7 +83,11 @@ export default {
             wrapper.addEventListener(
               "touchstart",
               (e) => {
-                e.preventDefault(); // 🚀 prevent scroll
+                if (e.target.closest(".back-button")) {
+                  // 🚫 Don't flap if back button was pressed
+                  return;
+                }
+                e.preventDefault();
                 this.flap();
               },
               { passive: false }

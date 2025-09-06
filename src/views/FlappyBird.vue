@@ -78,6 +78,8 @@ export default {
       this.pipeTimer = 0;
       this.gameStarted = true;  // ✅ now running
 
+      document.body.style.overflow = "hidden";
+
       const canvas = this.$refs.canvas;
       let topHeight = Math.random() * (canvas.height - this.pipeGap - 100) + 50;
       this.pipes.push({

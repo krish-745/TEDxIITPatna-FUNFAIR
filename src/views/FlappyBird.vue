@@ -4,6 +4,7 @@
     <h1 class="title">Flappy Bird</h1>
     <div class="game-container">
       <canvas ref="canvas" width="400" height="450"></canvas>
+
       <div v-if="gameOver" class="overlay">
         <h2>Game Over!</h2>
         <p>Your Score: {{ score }}</p>
@@ -21,6 +22,7 @@
     <div class="controls">
       <p>Score: <span class="score">{{ score }}</span></p>
       <p class="instructions">Space / Click / Tap to Flap</p>
+      <button @click="startGame" v-if="!gameStarted">Start Game</button>
     </div>
   </div>
 </template>
@@ -43,28 +45,28 @@ export default {
       roll: "",
       snakeScore: 0,
       stackScore: 0,
-      lastTime: null,   // for delta time
-      pipeTimer: 0,     // ms since last pipe
-      pipeInterval: 1500, // ms between pipes
+      lastTime: null,
+      pipeTimer: 0,
+      pipeInterval: 1500,
+      gameStarted: false,   // ✅ start button state
     };
   },
   mounted() {
     const canvas = this.$refs.canvas;
     this.ctx = canvas.getContext("2d");
-    this.startGame();
 
     // keyboard
     window.addEventListener("keydown", this.handleKey);
 
-    // 🔑 tap/click anywhere on the screen
-    window.addEventListener("click", this.flap);
-    window.addEventListener("touchstart", this.flap, { passive: true });
+    // click/touch to flap
+    canvas.addEventListener("click", this.flap);
+    canvas.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      this.flap();
+    }, { passive: false });
   },
-
   beforeUnmount() {
     window.removeEventListener("keydown", this.handleKey);
-    window.removeEventListener("click", this.flap);
-    window.removeEventListener("touchstart", this.flap);
   },
   methods: {
     startGame() {
@@ -74,26 +76,8 @@ export default {
       this.gameOver = false;
       this.lastTime = null;
       this.pipeTimer = 0;
+      this.gameStarted = true;  // ✅ now running
 
-          // Scroll lock: prevent scrolling on touch devices when interacting with the game
-          const wrapper = this.$refs.gameWrapper;
-          if (wrapper) {
-            wrapper.addEventListener("touchmove", (e) => e.preventDefault(), { passive: false });
-
-            wrapper.addEventListener(
-              "touchstart",
-              (e) => {
-                if (e.target.closest(".back-button")) {
-                  // 🚫 Don't flap if back button was pressed
-                  return;
-                }
-                e.preventDefault();
-                this.flap();
-              },
-              { passive: false }
-            );
-          }
-      // 🟢 Spawn first pipe immediately
       const canvas = this.$refs.canvas;
       let topHeight = Math.random() * (canvas.height - this.pipeGap - 100) + 50;
       this.pipes.push({
@@ -107,12 +91,12 @@ export default {
       this.gameLoop = requestAnimationFrame(this.update.bind(this));
     },
     flap() {
-      if (!this.gameOver) {
+      if (this.gameStarted && !this.gameOver) {
         this.bird.velocity = this.jump;
       }
     },
     handleKey(e) {
-      if (e.code === "Space" || e.code === "ArrowUp") {
+      if ((e.code === "Space" || e.code === "ArrowUp") && this.gameStarted) {
         e.preventDefault();
         this.flap();
       }
@@ -120,7 +104,7 @@ export default {
     update(timestamp) {
       if (!this.lastTime) this.lastTime = timestamp;
       const deltaMs = timestamp - this.lastTime;
-      const delta = deltaMs / 16.67; // relative to 60fps
+      const delta = deltaMs / 16.67;
       this.lastTime = timestamp;
 
       const ctx = this.ctx;
@@ -142,7 +126,7 @@ export default {
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Pipe spawning (time-based)
+      // Pipe spawning
       this.pipeTimer += deltaMs;
       if (this.pipeTimer > this.pipeInterval) {
         let topHeight = Math.random() * (canvas.height - this.pipeGap - 100) + 50;
@@ -155,7 +139,7 @@ export default {
         this.pipeTimer = 0;
       }
 
-      // Update and draw pipes
+      // Update & draw pipes
       this.pipes.forEach((pipe) => {
         pipe.x -= 2 * delta;
 
@@ -168,17 +152,15 @@ export default {
         ctx.strokeRect(pipe.x, 0, this.pipeWidth, pipe.top);
         ctx.strokeRect(pipe.x, pipe.bottom, this.pipeWidth, canvas.height - pipe.bottom);
 
-        // Collision
         if (
           this.bird.x + this.bird.radius > pipe.x &&
           this.bird.x - this.bird.radius < pipe.x + this.pipeWidth &&
           (this.bird.y - this.bird.radius < pipe.top ||
-            this.bird.y + this.bird.radius > pipe.bottom)
+           this.bird.y + this.bird.radius > pipe.bottom)
         ) {
           this.endGame();
         }
 
-        // Score
         if (pipe.x + this.pipeWidth < this.bird.x && !pipe.passed) {
           this.score++;
           pipe.passed = true;
@@ -187,7 +169,6 @@ export default {
 
       this.pipes = this.pipes.filter((pipe) => pipe.x + this.pipeWidth > 0);
 
-      // Ground / ceiling collision
       if (
         this.bird.y + this.bird.radius >= canvas.height ||
         this.bird.y - this.bird.radius <= 0
@@ -199,6 +180,7 @@ export default {
     },
     endGame() {
       this.gameOver = true;
+      this.gameStarted = false;   // ✅ show Start Game again
       cancelAnimationFrame(this.gameLoop);
     },
     async submitScore() {
@@ -211,7 +193,6 @@ export default {
         alert("Invalid Roll Number format. Example: 2101CS01");
         return;
       }
-
       try {
         await fetch("https://script.google.com/macros/s/AKfycbyZERpdFBcjiPbUlzOfhMjuQUAFzxjDWWKaCD9jwbsKexbE8cBto2CSgPT3nrcvJy14ew/exec", {
           method: "POST",
@@ -230,14 +211,6 @@ export default {
       }
     },
   },
-  beforeUnmount() {
-    window.removeEventListener("keydown", this.handleKey);
-    const wrapper = this.$refs.gameWrapper;
-    if (wrapper) {
-      wrapper.removeEventListener("touchmove", (e) => e.preventDefault());
-      wrapper.removeEventListener("touchstart", this.flap);
-    }
-  }
 };
 </script>
 

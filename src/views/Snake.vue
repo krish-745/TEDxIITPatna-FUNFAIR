@@ -213,14 +213,31 @@ export default {
     this.ctx = canvas.getContext("2d");
     this.draw();
 
-    // Attach swipe detection globally (anywhere on screen)
-    window.addEventListener("touchstart", this.handleTouchStart, { passive: false });
-    window.addEventListener("touchend", this.handleTouchEnd, { passive: false });
+    const wrapper = this.$refs.gameWrapper;
+
+    // 🚀 Lock scroll only inside the game area
+    if (wrapper) {
+      wrapper.addEventListener(
+        "touchmove",
+        (e) => {
+          e.preventDefault();
+        },
+        { passive: false }
+      );
+
+      // Attach swipe detection only inside game wrapper
+      wrapper.addEventListener("touchstart", this.handleTouchStart, { passive: false });
+      wrapper.addEventListener("touchend", this.handleTouchEnd, { passive: false });
+    }
   },
 
   beforeUnmount() {
-    window.removeEventListener("touchstart", this.handleTouchStart);
-    window.removeEventListener("touchend", this.handleTouchEnd);
+    const wrapper = this.$refs.gameWrapper;
+    if (wrapper) {
+      wrapper.removeEventListener("touchmove", this.preventScroll);
+      wrapper.removeEventListener("touchstart", this.handleTouchStart);
+      wrapper.removeEventListener("touchend", this.handleTouchEnd);
+    }
   },
 };
 </script>

@@ -77,9 +77,16 @@ export default {
           // Scroll lock: prevent scrolling on touch devices when interacting with the game
           const wrapper = this.$refs.gameWrapper;
           if (wrapper) {
-            wrapper.addEventListener('touchmove', function(e) {
-              e.preventDefault();
-            }, { passive: false });
+            wrapper.addEventListener("touchmove", (e) => e.preventDefault(), { passive: false });
+
+            wrapper.addEventListener(
+              "touchstart",
+              (e) => {
+                e.preventDefault(); // 🚀 prevent scroll
+                this.flap();
+              },
+              { passive: false }
+            );
           }
       // 🟢 Spawn first pipe immediately
       const canvas = this.$refs.canvas;
@@ -220,7 +227,12 @@ export default {
   },
   beforeUnmount() {
     window.removeEventListener("keydown", this.handleKey);
-  },
+    const wrapper = this.$refs.gameWrapper;
+    if (wrapper) {
+      wrapper.removeEventListener("touchmove", (e) => e.preventDefault());
+      wrapper.removeEventListener("touchstart", this.flap);
+    }
+  }
 };
 </script>
 
@@ -324,5 +336,13 @@ button:hover {
   background: #330000;
   outline: none;
   caret-color: #ff1a1a;
+}
+
+.game-wrapper {
+  touch-action: none;  /* 🚀 stop gestures inside wrapper */
+}
+
+canvas {
+  touch-action: none;  /* 🚀 stop pinch-zoom & scroll on canvas */
 }
 </style>

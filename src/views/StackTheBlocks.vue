@@ -54,10 +54,21 @@ export default {
     // Prevent scroll while playing
     const wrapper = this.$refs.gameWrapper;
     if (wrapper) {
+      // Prevent scroll on swipe
       wrapper.addEventListener(
         "touchmove",
         function (e) {
           e.preventDefault();
+        },
+        { passive: false }
+      );
+
+      // Tap to place block and prevent scroll
+      wrapper.addEventListener(
+        "touchstart",
+        (e) => {
+          e.preventDefault(); // 🚀 stop scroll
+          this.placeBlock();
         },
         { passive: false }
       );
@@ -68,13 +79,16 @@ export default {
 
     // 🔑 allow tapping/clicking anywhere on screen
     window.addEventListener("click", this.placeBlock);
-    window.addEventListener("touchstart", this.placeBlock, { passive: true });
+    // window.addEventListener("touchstart", this.placeBlock, { passive: true });
   },
 
   beforeUnmount() {
     window.removeEventListener("keydown", this.handleKey);
-    window.removeEventListener("click", this.placeBlock);
-    window.removeEventListener("touchstart", this.placeBlock);
+    const wrapper = this.$refs.gameWrapper;
+    if (wrapper) {
+      wrapper.removeEventListener("touchmove", function (e) { e.preventDefault(); });
+      wrapper.removeEventListener("touchstart", this.placeBlock);
+    }
   },
   methods: {
     startGame() {
@@ -234,5 +248,12 @@ button { background:#b30000; color:white; font-family:inherit; border:none; padd
 button:hover { background:#cc0000; transform:scale(1.05); }
 .overlay { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(20,0,0,0.9); display:flex; flex-direction:column; justify-content:center; align-items:center; border-radius:8px; }
 .overlay h2 { color:#ff3333; margin-bottom:10px; }
-.roll-input { margin:8px 0; padding:6px; border-radius:4px; border:none; font-family:inherit; text-align:center; color:#fff; background:#330000; outline:none; caret-color:#ff1a1a; }
+.roll-input { margin:8px 0; padding:6px; border-radius:4px; border:none; font-family:inherit; text-align:center; color:#fff; background:#330000; outline:none; caret-color:#ff1a1a; } .game-wrapper {
+  touch-action: none;  /* 🚀 prevent gestures/scroll inside wrapper */
+}
+
+canvas {
+  touch-action: none;  /* 🚀 prevent pinch-zoom & scroll on canvas */
+}
+
 </style>

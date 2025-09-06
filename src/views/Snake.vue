@@ -358,4 +358,10 @@ button:hover {
   outline: none;
   caret-color: #ff1a1a;
 }
+
+@media(max-width: 767px) {
+  .game-wrapper {
+    padding-top: 60px;
+  }
+}
 </style>

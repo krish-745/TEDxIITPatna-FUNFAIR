@@ -360,11 +360,16 @@ canvas {
   box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
   transition: 0.2s;
   z-index: 10;
+  margin-bottom: 2rem;
 }
 
 .back-button:hover {
   background: #cc0000;
   transform: scale(1.05);
 }
-
+@media(max-width: 767px) {
+  .game-wrapper {
+    padding-top: 60px;
+  }
+}
 </style>

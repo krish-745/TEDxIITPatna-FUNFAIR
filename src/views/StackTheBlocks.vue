@@ -276,5 +276,9 @@ canvas {
   background: #cc0000;
   transform: scale(1.05);
 }
-
+@media(max-width: 767px) {
+  .game-wrapper {
+    padding-top: 60px;
+  }
+}
 </style>

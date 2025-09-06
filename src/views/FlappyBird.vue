@@ -73,11 +73,15 @@ export default {
       this.gameOver = false;
       this.lastTime = null;
       this.pipeTimer = 0;
-      this.gameStarted = true;  // ✅ now running
+      this.gameStarted = true;
 
       document.body.style.overflow = "hidden";
 
       const canvas = this.$refs.canvas;
+      this.ctx = canvas.getContext("2d");
+
+      window.addEventListener("keydown", this.handleKey); // ✅ rebind keys
+
       let topHeight = Math.random() * (canvas.height - this.pipeGap - 100) + 50;
       this.pipes.push({
         x: canvas.width,
@@ -179,8 +183,9 @@ export default {
     },
     endGame() {
       this.gameOver = true;
-      this.gameStarted = false;   // ✅ show Start Game again
+      this.gameStarted = false;
       cancelAnimationFrame(this.gameLoop);
+      window.removeEventListener("keydown", this.handleKey); // ✅ cleanup
     },
     async submitScore() {
       if (!this.roll) {

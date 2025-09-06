@@ -50,21 +50,31 @@ export default {
     const canvas = this.$refs.canvas;
     this.ctx = canvas.getContext("2d");
     this.startGame();
-    // Scroll lock: prevent scrolling on touch devices when interacting with the game
+
+    // Prevent scroll while playing
     const wrapper = this.$refs.gameWrapper;
     if (wrapper) {
-      wrapper.addEventListener('touchmove', function(e) {
-        e.preventDefault();
-      }, { passive: false });
+      wrapper.addEventListener(
+        "touchmove",
+        function (e) {
+          e.preventDefault();
+        },
+        { passive: false }
+      );
     }
 
+    // keyboard
     window.addEventListener("keydown", this.handleKey);
 
-    if ("ontouchstart" in window) {
-      canvas.addEventListener("touchstart", this.placeBlock);
-    } else {
-      canvas.addEventListener("click", this.placeBlock);
-    }
+    // 🔑 allow tapping/clicking anywhere on screen
+    window.addEventListener("click", this.placeBlock);
+    window.addEventListener("touchstart", this.placeBlock, { passive: true });
+  },
+
+  beforeUnmount() {
+    window.removeEventListener("keydown", this.handleKey);
+    window.removeEventListener("click", this.placeBlock);
+    window.removeEventListener("touchstart", this.placeBlock);
   },
   methods: {
     startGame() {

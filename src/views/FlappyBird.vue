@@ -52,9 +52,18 @@ export default {
     this.ctx = canvas.getContext("2d");
     this.startGame();
 
+    // keyboard
     window.addEventListener("keydown", this.handleKey);
-    canvas.addEventListener("click", this.flap);
-    canvas.addEventListener("touchstart", this.flap);
+
+    // 🔑 tap/click anywhere on the screen
+    window.addEventListener("click", this.flap);
+    window.addEventListener("touchstart", this.flap, { passive: true });
+  },
+
+  beforeUnmount() {
+    window.removeEventListener("keydown", this.handleKey);
+    window.removeEventListener("click", this.flap);
+    window.removeEventListener("touchstart", this.flap);
   },
   methods: {
     startGame() {

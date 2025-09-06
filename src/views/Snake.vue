@@ -146,12 +146,10 @@ export default {
         this.direction = { x: 20, y: 0 };
     },
     handleTouchStart(e) {
-      e.preventDefault(); // 🚀 block scrolling only when touching canvas
       this.touchStartX = e.changedTouches[0].screenX;
       this.touchStartY = e.changedTouches[0].screenY;
     },
     handleTouchEnd(e) {
-      e.preventDefault(); // 🚀 block scrolling only when touching canvas
       const dx = e.changedTouches[0].screenX - this.touchStartX;
       const dy = e.changedTouches[0].screenY - this.touchStartY;
 
@@ -215,21 +213,14 @@ export default {
     this.ctx = canvas.getContext("2d");
     this.draw();
 
-    // Only prevent default on game canvas
-    canvas.addEventListener("touchstart", this.handleTouchStart, { passive: false });
-    canvas.addEventListener("touchend", this.handleTouchEnd, { passive: false });
-    // Scroll lock: prevent scrolling on touch devices when interacting with the game
-    const wrapper = this.$refs.gameWrapper;
-    if (wrapper) {
-      wrapper.addEventListener('touchmove', function(e) {
-        e.preventDefault();
-      }, { passive: false });
-    }
+    // Attach swipe detection globally (anywhere on screen)
+    window.addEventListener("touchstart", this.handleTouchStart, { passive: false });
+    window.addEventListener("touchend", this.handleTouchEnd, { passive: false });
   },
+
   beforeUnmount() {
-    const canvas = this.$refs.gameCanvas;
-    canvas.removeEventListener("touchstart", this.handleTouchStart);
-    canvas.removeEventListener("touchend", this.handleTouchEnd);
+    window.removeEventListener("touchstart", this.handleTouchStart);
+    window.removeEventListener("touchend", this.handleTouchEnd);
   },
 };
 </script>

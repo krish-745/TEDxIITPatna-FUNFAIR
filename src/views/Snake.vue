@@ -1,5 +1,6 @@
 <template>
   <div class="game-wrapper" ref="gameWrapper">
+    <div class="back-button" @click="$router.push('/')">Back</div>
     <h1 class="title">Snake Game</h1>
     <div class="game-layout">
       <div class="game-container">
@@ -45,7 +46,7 @@ export default {
       gameStarted: false,
       touchStartX: 0,
       touchStartY: 0,
-      roll: "", // <-- Added roll no field
+      roll: "",
     };
   },
   methods: {
@@ -214,8 +215,6 @@ export default {
     this.draw();
 
     const wrapper = this.$refs.gameWrapper;
-
-    // 🚀 Lock scroll only inside the game area
     if (wrapper) {
       wrapper.addEventListener(
         "touchmove",
@@ -224,8 +223,6 @@ export default {
         },
         { passive: false }
       );
-
-      // Attach swipe detection only inside game wrapper
       wrapper.addEventListener("touchstart", this.handleTouchStart, { passive: false });
       wrapper.addEventListener("touchend", this.handleTouchEnd, { passive: false });
     }
@@ -254,11 +251,31 @@ export default {
   background: linear-gradient(160deg, #000, #1a0000);
   min-height: 100vh;
   padding: 20px;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: #b30000;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+  transition: 0.2s;
+  z-index: 10;
+}
+
+.back-button:hover {
+  background: #cc0000;
+  transform: scale(1.05);
 }
 
 .title {
   color: #ff1a1a;
-  /* text-shadow: 0 0 12px #ff0000, 0 0 24px #ff0000; */
   margin-bottom: 20px;
   letter-spacing: 2px;
   text-align: center;
@@ -280,6 +297,7 @@ canvas {
   border-radius: 8px;
   max-width: 100%;
   height: auto;
+  touch-action: none;
 }
 
 .controls {
@@ -335,14 +353,9 @@ button:hover {
   border: none;
   font-family: inherit;
   text-align: center;
-  color: #fff;             /* White text */
-  background: #330000;     /* Dark reddish background */
-  outline: none;           /* Remove default outline */
-  caret-color: #ff1a1a;    /* Red cursor */
+  color: #fff;
+  background: #330000;
+  outline: none;
+  caret-color: #ff1a1a;
 }
-
-canvas {
-  touch-action: none; /* 🚀 disables default pan/zoom only inside canvas */
-}
-
 </style>

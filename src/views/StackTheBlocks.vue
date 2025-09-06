@@ -1,5 +1,6 @@
 <template>
   <div class="game-wrapper" ref="gameWrapper">
+    <div class="back-button" @click="$router.push('/')">Back</div>
     <h1 class="title">Stack The Blocks</h1>
     <div class="game-container">
       <canvas ref="canvas" width="400" height="450"></canvas>
@@ -254,6 +255,26 @@ button:hover { background:#cc0000; transform:scale(1.05); }
 
 canvas {
   touch-action: none;  /* 🚀 prevent pinch-zoom & scroll on canvas */
+}
+
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: #b30000;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+  transition: 0.2s;
+  z-index: 10;
+}
+
+.back-button:hover {
+  background: #cc0000;
+  transform: scale(1.05);
 }
 
 </style>

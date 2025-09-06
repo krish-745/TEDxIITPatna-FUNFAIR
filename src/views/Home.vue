@@ -43,6 +43,17 @@
         <button @click.stop="launchGame(game.route)">Play</button>
       </div>
     </section>
+
+    <!-- External Link Button -->
+    <div class="external-link">
+      <a
+        href="https://tedxiitpatna.iitp.ac.in/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <button>Check out TEDxIITPatna's Official Website</button>
+      </a>
+    </div>
   </div>
 </template>
 
@@ -218,6 +229,29 @@ button:hover {
   color: #cd7f32; /* bronze */
   font-weight: bold;
   /* text-shadow: 0 0 8px #cd7f32; */
+}
+
+.external-link {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.external-link button {
+  background: #ff1a1a;
+  color: white;
+  font-family: "Press Start 2P", monospace, sans-serif;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(255, 0, 0, 0.7);
+  transition: 0.2s;
+  font-size: 12px;
+}
+
+.external-link button:hover {
+  background: #cc0000;
+  transform: scale(1.05);
 }
 
 </style>

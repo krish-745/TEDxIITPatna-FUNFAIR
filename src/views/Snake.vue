@@ -1,6 +1,6 @@
 <template>
   <div class="game-wrapper" ref="gameWrapper">
-    <div class="back-button" @click="$router.push('/')">Back</div>
+    <button class="back-button" @click="$router.push('/')">Back</button>
     <h1 class="title">Snake Game</h1>
     <div class="game-layout">
       <div class="game-container">

@@ -1,6 +1,6 @@
 <template>
   <div class="game-wrapper" ref="gameWrapper">
-    <div class="back-button" @click="$router.push('/')">Back</div>
+    <button class="back-button" @click="$router.push('/')">Back</button>
     <h1 class="title">Stack The Blocks</h1>
     <div class="game-container">
       <canvas ref="canvas" width="400" height="450"></canvas>

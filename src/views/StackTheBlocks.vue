@@ -1,6 +1,6 @@
 <template>
   <div class="game-wrapper" ref="gameWrapper">
-    <button class="back-button" @click="$router.push('/')">Back</button>
+    <button class="back-button" @click.stop="$router.push('/')">Back</button>
     <h1 class="title">Stack The Blocks</h1>
     <div class="game-container">
       <canvas ref="canvas" width="400" height="450"></canvas>
@@ -13,8 +13,8 @@
           placeholder="Enter Roll Number"
           class="roll-input"
         />
-        <button @click="submitScore">Submit Score</button>
-        <button @click="startGame">Restart</button>
+        <button @click.stop="submitScore">Submit Score</button>
+        <button @click.stop="startGame">Restart</button>
       </div>
     </div>
     <div class="controls">
@@ -69,8 +69,8 @@ export default {
         "touchstart",
         (e) => {
           if (e.target.closest(".back-button") || 
-      e.target.closest("button") || 
-      e.target.closest("input")) {
+              e.target.closest("button") || 
+              e.target.closest("input")) {
             // 🚫 Don't flap if back button was pressed
             return;
           }

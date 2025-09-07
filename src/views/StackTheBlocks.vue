@@ -68,7 +68,9 @@ export default {
       wrapper.addEventListener(
         "touchstart",
         (e) => {
-          if (e.target.closest(".back-button")) {
+          if (e.target.closest(".back-button") || 
+      e.target.closest("button") || 
+      e.target.closest("input")) {
             // 🚫 Don't flap if back button was pressed
             return;
           }

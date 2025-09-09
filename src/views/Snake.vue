@@ -198,9 +198,7 @@ export default {
           body: JSON.stringify({
             action: "upsert",
             roll: this.roll,
-            snakeScore: this.score,
-            flappyScore: this.flappyScore || 0,
-            stackScore: this.stackScore || 0
+            snakeScore: this.score
           }),
         });
         alert("Score submitted!");

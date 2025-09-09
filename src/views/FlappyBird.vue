@@ -204,9 +204,7 @@ export default {
           body: JSON.stringify({
             action: "upsert",
             roll: this.roll,
-            snakeScore: this.snakeScore || 0,
-            flappyScore: this.Score,
-            stackScore: this.stackScore || 0
+            flappyScore: this.score
           }),
         });
         alert("Score submitted!");

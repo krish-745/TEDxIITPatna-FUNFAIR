@@ -223,8 +223,6 @@ export default {
           body: JSON.stringify({
             action: "upsert",
             roll: this.roll,
-            snakeScore: this.snakeScore || 0,
-            flappyScore: this.flappyScore || 0,
             stackScore: this.score
           }),
         });

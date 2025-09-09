@@ -69,8 +69,7 @@ export default {
         { name: "Stack The Blocks", description: "Test your timing and precision.", route: "/stacktheblocks" },
       ],
       loading: true,
-      API_URL:
-        "https://script.google.com/macros/s/AKfycbyZERpdFBcjiPbUlzOfhMjuQUAFzxjDWWKaCD9jwbsKexbE8cBto2CSgPT3nrcvJy14ew/exec",
+      API_URL: "/api/submitScore",
     };
   },
   methods: {

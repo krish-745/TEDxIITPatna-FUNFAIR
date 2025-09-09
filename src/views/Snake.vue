@@ -192,14 +192,15 @@ export default {
         return;
       }
       try {
-        await fetch("https://script.google.com/macros/s/AKfycbyZERpdFBcjiPbUlzOfhMjuQUAFzxjDWWKaCD9jwbsKexbE8cBto2CSgPT3nrcvJy14ew/exec", {
+        await fetch("/api/submitScore", {
           method: "POST",
-          body: new URLSearchParams({
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
             action: "upsert",
             roll: this.roll,
             snakeScore: this.score,
-            flappyScore: this.flappyScore,
-            stackScore: this.stackScore
+            flappyScore: this.flappyScore || 0,
+            stackScore: this.stackScore || 0
           }),
         });
         alert("Score submitted!");

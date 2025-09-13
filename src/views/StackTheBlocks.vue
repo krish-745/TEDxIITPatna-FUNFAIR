@@ -217,16 +217,17 @@ export default {
         return;
       }
       try {
-        await fetch("/api/submitScore", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action: "upsert",
-            roll: this.roll,
-            stackScore: this.score
-          }),
-        });
-        alert("Score submitted!");
+        //await fetch("/api/submitScore", {
+          //method: "POST",
+          //headers: { "Content-Type": "application/json" },
+          //body: JSON.stringify({
+            //action: "upsert",
+            //roll: this.roll,
+            //stackScore: this.score
+          //}),
+        //});
+        //alert("Score submitted!");
+        alert("The leaderboard is now frozen./nThanks for playing!");
       } catch (err) {
         console.error(err);
         alert("Error submitting score");

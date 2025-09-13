@@ -227,7 +227,7 @@ export default {
           //}),
         //});
         //alert("Score submitted!");
-        alert("The leaderboard is now frozen./nThanks for playing!");
+        alert("The leaderboard is now frozen.\nThanks for playing!");
       } catch (err) {
         console.error(err);
         alert("Error submitting score");
